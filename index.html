@@ -311,6 +311,52 @@
         </div> <!-- end of container -->
     </div> <!-- end of basic-3 -->
     <!-- end of projects -->
+<script>
+  const username = "affaf12"; // your GitHub username
+  const projectsContainer = document.getElementById("projects-container");
+
+  fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`)
+    .then((response) => response.json())
+    .then((data) => {
+      document.getElementById("loading").remove();
+
+      let repoHTML = "";
+      data.forEach((repo) => {
+        if (!repo.fork && repo.description) {
+          // Assume screenshot.png exists in repo root
+          const imageURL = `https://raw.githubusercontent.com/${username}/${repo.name}/main/screenshot.png`;
+
+          repoHTML += `
+            <div class="col-md-4 mb-4">
+              <div class="card shadow-sm h-100">
+                <img src="${imageURL}" class="card-img-top" alt="${repo.name} Screenshot"
+                     onerror="this.style.display='none';"> <!-- hides img if not found -->
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <a href="${repo.html_url}" target="_blank">${repo.name}</a>
+                  </h5>
+                  <p class="card-text">${repo.description}</p>
+                </div>
+                <div class="card-footer text-muted small">
+                  ⭐ ${repo.stargazers_count} | ⏰ Updated: ${new Date(
+                    repo.updated_at
+                  ).toLocaleDateString()}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      projectsContainer.innerHTML =
+        repoHTML || "<p>No projects found on GitHub.</p>";
+    })
+    .catch((error) => {
+      document.getElementById("loading").innerText =
+        "⚠️ Failed to load projects.";
+      console.error("GitHub API Error:", error);
+    });
+</script>
 
     <!-- Testimonials -->
     <div class="cards-1">
@@ -467,3 +513,4 @@
 
 </body>
 </html>
+
